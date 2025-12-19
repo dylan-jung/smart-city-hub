@@ -37,8 +37,8 @@ export type AttachmentFile = {
   name: string;
 };
 
-export type AuthTokenGetter = () => string | null;
-export type AuthTokenSetter = (token: string | null) => void;
+export type AuthTokenGetter = () => Promise<string | null>;
+export type AuthTokenSetter = (token: string | null) => Promise<void>;
 
 export type UserPrivilege = "manager" | "user";
 export type UserItem = {

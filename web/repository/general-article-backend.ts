@@ -1,4 +1,4 @@
-import { GeneralArticle, AuthTokenGetter } from "core/model";
+import { AuthTokenGetter, GeneralArticle } from "core/model";
 import { GeneralArticleRepository } from "core/repository";
 
 export default class GeneralArticleBackendRepo implements GeneralArticleRepository {
@@ -26,7 +26,7 @@ export default class GeneralArticleBackendRepo implements GeneralArticleReposito
     };
   }
 
-  private fetchArticle(
+  private async fetchArticle(
     method: "GET" | "POST" | "DELETE",
     endpoint?: string,
     req?: {
@@ -34,7 +34,7 @@ export default class GeneralArticleBackendRepo implements GeneralArticleReposito
       body?: BodyInit;
     }
   ) {
-    const accessToken = this.getAccessToken();
+    const accessToken = await this.getAccessToken();
 
     return fetch(`${this.baseUrl}/v2/article${endpoint}`, {
       method,

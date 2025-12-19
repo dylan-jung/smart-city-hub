@@ -19,7 +19,7 @@ export default class AttachmentFileBackendRepo implements AttachmentFileReposito
   }
 
   async upload(file: File): Promise<AttachmentFile> {
-    const accessToken = this.getAccessToken();
+    const accessToken = await this.getAccessToken();
     const formData = new FormData();
     formData.append("file", file);
 

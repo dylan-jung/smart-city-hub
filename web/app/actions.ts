@@ -1,15 +1,15 @@
 "use server";
 
-import {
-  UserItem,
-  GeneralArticle,
-  AttachmentFile,
-  PrimaryArticle,
-  ProjectRecordItem,
-  Locale,
-} from "core/model";
 import { repo } from "@/di";
 import { getAccessToken, setAccessToken } from "@/utils";
+import {
+    AttachmentFile,
+    GeneralArticle,
+    Locale,
+    PrimaryArticle,
+    ProjectRecordItem,
+    UserItem,
+} from "core/model";
 import { revalidatePath } from "next/cache";
 
 export type AuthState = {
@@ -18,8 +18,9 @@ export type AuthState = {
   error?: string;
 };
 
+
 export async function doLogin(prevState: AuthState, formData: FormData): Promise<AuthState> {
-  setAccessToken("");
+  await setAccessToken("");
 
   const id = formData.get("userid")?.toString();
   const pw = formData.get("plainpw")?.toString();
@@ -33,7 +34,7 @@ export async function doLogin(prevState: AuthState, formData: FormData): Promise
   try {
     const token = await repo.authTokenIDPW.issue({ id, pw });
     const user = await repo.authTokenIDPW.whoami(token);
-    setAccessToken(token);
+    await setAccessToken(token);
     return { token, user: user || undefined };
   } catch (err) {
     return {
@@ -43,11 +44,11 @@ export async function doLogin(prevState: AuthState, formData: FormData): Promise
 }
 
 export async function doLogout(): Promise<void> {
-  setAccessToken(null);
+  await setAccessToken(null);
 }
 
 export async function checkWhoami(): Promise<UserItem | null> {
-  const token = getAccessToken();
+  const token = await getAccessToken();
   if (!token) return null;
 
   return await repo.authTokenIDPW.whoami(token);
