@@ -1,18 +1,23 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { Locale } from "core/model";
-import { initTranslation } from "@locales";
 import Container from "@components/container";
+import { initTranslation } from "@locales";
+import { Locale } from "core/model";
 
-import { getPageCoverImage } from "@resources/images/page-covers";
-import { aseanFlags } from "@resources/images/asean-flags";
 import { repo } from "@/di";
+import { aseanFlags } from "@resources/images/asean-flags";
+import { getPageCoverImage } from "@resources/images/page-covers";
+
+function toLocale(lang: string): Locale {
+  if (lang === "ko" || lang === "en") return lang as Locale;
+  throw new Error("Invalid language");
+}
 
 export default async function Layout(
   props: {
     children: React.ReactNode;
-    params: Promise<{ lang: Locale; country: string }>;
+    params: Promise<{ lang: string; country: string }>;
   }
 ) {
   const params = await props.params;
@@ -22,7 +27,9 @@ export default async function Layout(
   } = props;
 
   const { lang, country } = params;
-  const { t } = await initTranslation(lang);
+  const locale = toLocale(lang);
+
+  const { t } = await initTranslation(locale);
 
   return (
     <>
