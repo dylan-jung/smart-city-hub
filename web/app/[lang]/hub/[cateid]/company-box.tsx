@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useTranslation } from "react-i18next";
-import { SolutionCompany, SolutionItem } from "core/model";
 import { getSolutionsByCompany } from "@/actions";
+import { SecretButton } from "@components/secret-components";
+import { SolutionCompany, SolutionItem } from "core/model";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function CompanyBox(props: {
   company: SolutionCompany;
@@ -52,7 +54,12 @@ export default function CompanyBox(props: {
         <div className="mt-4 mb-2">
           {solutions.map((solution) => (
             <div key={solution.solutionId} className="border-t px-2 pt-4 mt-4 text-sm">
-              <div className="font-semibold text-lg text-uos-signiture-blue">{solution.title}</div>
+              <div className="font-semibold text-lg text-uos-signiture-blue hover:underline cursor-pointer flex items-center group">
+                 <Link href={`/hub/detail/company/${company.companyId}/solution/${solution.solutionId}`}>
+                  {solution.title}
+                  <span className="font-normal ml-2 inline-block transition-transform group-hover:translate-x-1">{">>"}</span>
+                 </Link>
+              </div>
               <div className="mt-1">{solution.summary}</div>
               <div className="mt-3 font-bold">✓ 솔루션 개요</div>
               <div>{solution.abstract}</div>
@@ -62,6 +69,17 @@ export default function CompanyBox(props: {
               <div>{solution.composition}</div>
             </div>
           ))}
+          <div className="mt-4 flex justify-end px-2">
+            <SecretButton
+              className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded shadow-sm transition-colors"
+              onClick={() => {
+                alert("Add functionality to be implemented");
+              }}
+            >
+              + {t("추가")}
+            </SecretButton>
+          </div>
+
         </div>
       )}
     </div>

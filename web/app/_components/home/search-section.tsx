@@ -28,7 +28,7 @@ export default function SearchSection() {
       </h2>
       <div className="flex w-full max-w-3xl bg-white rounded-lg shadow-lg overflow-hidden border border-uos-gray-soft">
         <select
-          className="bg-global-gray-soft px-6 py-4 text-uos-gray font-medium outline-none border-r border-uos-gray-soft hover:bg-gray-100 transition-colors cursor-pointer"
+          className="bg-global-gray-soft px-6 py-4 text-uos-gray font-medium outline-none border-r border-uos-gray-soft hover:bg-gray-100 transition-colors cursor-pointer appearance-none"
           value={option}
           onChange={(e) => setOption(e.target.value)}
         >
