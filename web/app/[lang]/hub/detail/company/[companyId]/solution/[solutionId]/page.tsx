@@ -1,7 +1,7 @@
 import Container from "@components/container";
-import { SecretButton } from "@components/secret-components";
 import { initTranslation } from "@locales";
 import { Locale } from "core/model";
+import EditButton from "./edit-button";
 
 type Props = {
   params: Promise<{
@@ -142,20 +142,12 @@ export default async function SolutionDetailPage(props: Props) {
           </div>
           
           {/* Modify Button Section */}
-          {/* Modify Button Section */}
           <div className="mt-12 flex justify-end pt-6 border-t border-gray-100">
-            <SecretButton 
-              className="bg-uos-blue hover:bg-uos-signiture-blue text-white px-6 py-2.5 rounded-lg font-medium shadow-sm transition-colors flex items-center"
-              onClick={() => {
-                // Modify functionality placeholder
-                alert("Modify functionality to be implemented");
-              }}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-              {t("수정")}
-            </SecretButton>
+            <EditButton
+              companyId={company.companyId}
+              solutionId={solution.solutionId}
+              label={t("수정")}
+            />
           </div>
           
         </div>
