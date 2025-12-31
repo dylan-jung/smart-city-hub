@@ -17,7 +17,7 @@ const navigationList: NavigationItem[] = [
     ],
   },
   {
-    text: "연구 & 사업",
+    text: "프로젝트",
     href: "/projects",
     subNav: [
       { text: "총괄 연구 & 사업", href: "/projects/summary" },
