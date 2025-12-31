@@ -29,6 +29,14 @@ const navigationList: NavigationItem[] = [
     ],
   },
   {
+    text: "스마트도시수출 거점HUB",
+    href: "/hub",
+    subNav: [
+      { text: "아세안 국가 정보", href: "/asean" },
+      { text: "스마트도시 솔루션", href: "/hub" },
+    ],
+  },
+  {
     text: "발간물",
     href: "/publish",
     subNav: [
@@ -44,14 +52,6 @@ const navigationList: NavigationItem[] = [
       { text: "스마트 뉴스", href: "/news/smart-news" },
       { text: "연구실적", href: "/news/research" },
       { text: "세미나", href: "/news/seminar" },
-    ],
-  },
-  {
-    text: "스마트도시수출 거점HUB",
-    href: "/hub",
-    subNav: [
-      { text: "아세안 국가 정보", href: "/asean" },
-      { text: "스마트도시 솔루션", href: "/hub" },
     ],
   },
 ];

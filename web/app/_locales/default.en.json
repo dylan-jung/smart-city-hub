@@ -65,5 +65,11 @@
   "notices": "Notices",
   "smart-news": "Smart News",
   "research": "Research Achievements",
-  "seminar": "Seminar"
+  "seminar": "Seminar",
+  "keyword-placeholder": "Search...",
+  "search": "Search",
+  "integrated-search": "All",
+  "country-search": "Country",
+  "solution-search": "Solution",
+  "search-title": "<<placeholder>>"
 }

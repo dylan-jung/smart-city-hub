@@ -34,5 +34,11 @@
   "cambodia": "캄보디아",
   "laos": "라오스",
   "brunei": "브루나이",
-  "singapore": "싱가포르"
+  "singapore": "싱가포르",
+  "keyword-placeholder": "검색어를 입력하세요...",
+  "search": "검색",
+  "integrated-search": "통합검색",
+  "country-search": "국가검색",
+  "solution-search": "솔루션검색",
+  "search-title": "<<placeholder>>"
 }
