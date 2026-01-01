@@ -23,9 +23,12 @@ export default function SearchSection() {
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center p-8">
-      <h2 className="text-3xl font-bold text-white mb-8">
+      <h2 className="text-3xl font-bold text-white mb-4">
         {t("search-title")}
       </h2>
+      <p className="text-base text-gray-100 mb-10 text-center leading-relaxed whitespace-pre-line">
+        {t("search-description")}
+      </p>
       <div className="flex w-full max-w-3xl bg-white rounded-lg shadow-lg overflow-hidden border border-uos-gray-soft">
         <select
           className="bg-global-gray-soft px-6 py-4 text-uos-gray font-medium outline-none border-r border-uos-gray-soft hover:bg-gray-100 transition-colors cursor-pointer appearance-none"
