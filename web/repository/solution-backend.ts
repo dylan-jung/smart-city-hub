@@ -1,17 +1,24 @@
 
-import { SolutionCompany, SolutionCompanyLocalized, SolutionItem, SolutionItemLocalized } from "core/model";
+import { AuthTokenGetter, SolutionCompany, SolutionCompanyLocalized, SolutionItem, SolutionItemLocalized } from "core/model";
 import { SolutionRepository } from "core/repository";
 
 export default class SolutionHttpRepo implements SolutionRepository {
   private readonly baseUrl: string;
+  private readonly getAccessToken: AuthTokenGetter;
 
-  constructor(params: { baseUrl: string }) {
+  constructor(params: { baseUrl: string; authTokenGetter: AuthTokenGetter }) {
     this.baseUrl = params.baseUrl;
+    this.getAccessToken = params.authTokenGetter;
   }
   async createCompany(company: SolutionCompany): Promise<SolutionCompany> {
+    const accessToken = await this.getAccessToken();
+    console.log(accessToken);
     const res = await fetch(`${this.baseUrl}/v2/solution/companies`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        Authorization: accessToken ? `Bearer ${accessToken}` : "",
+      },
       body: JSON.stringify(company),
     });
     if (!res.ok) throw new Error(`Failed to create company: ${res.statusText}`);
@@ -19,9 +26,13 @@ export default class SolutionHttpRepo implements SolutionRepository {
   }
 
   async updateCompany(company: Partial<SolutionCompany> & { companyId: string }): Promise<SolutionCompany | null> {
+    const accessToken = await this.getAccessToken();
     const res = await fetch(`${this.baseUrl}/v2/solution/companies/${company.companyId}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        Authorization: accessToken ? `Bearer ${accessToken}` : "",
+      },
       body: JSON.stringify(company),
     });
     if (!res.ok) throw new Error(`Failed to update company: ${res.statusText}`);
@@ -29,17 +40,25 @@ export default class SolutionHttpRepo implements SolutionRepository {
   }
 
   async deleteCompany(companyId: string): Promise<boolean> {
+    const accessToken = await this.getAccessToken();
     const res = await fetch(`${this.baseUrl}/v2/solution/companies/${companyId}`, {
         method: "DELETE",
+        headers: {
+            Authorization: accessToken ? `Bearer ${accessToken}` : "",
+        },
     });
     if (!res.ok) throw new Error(`Failed to delete company: ${res.statusText}`);
     return (await res.json()).success;
   }
 
   async createSolution(solution: SolutionItem): Promise<SolutionItem> {
+      const accessToken = await this.getAccessToken();
       const res = await fetch(`${this.baseUrl}/v2/solution/items`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        Authorization: accessToken ? `Bearer ${accessToken}` : "",
+      },
       body: JSON.stringify(solution),
     });
     if (!res.ok) throw new Error(`Failed to create solution: ${res.statusText}`);
@@ -47,9 +66,13 @@ export default class SolutionHttpRepo implements SolutionRepository {
   }
 
   async updateSolution(solution: Partial<SolutionItem> & { solutionId: string }): Promise<SolutionItem | null> {
+    const accessToken = await this.getAccessToken();
     const res = await fetch(`${this.baseUrl}/v2/solution/items/${solution.solutionId}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        Authorization: accessToken ? `Bearer ${accessToken}` : "",
+      },
       body: JSON.stringify(solution),
     });
     if (!res.ok) throw new Error(`Failed to update solution: ${res.statusText}`);
@@ -57,8 +80,12 @@ export default class SolutionHttpRepo implements SolutionRepository {
   }
 
   async deleteSolution(solutionId: string): Promise<boolean> {
+    const accessToken = await this.getAccessToken();
     const res = await fetch(`${this.baseUrl}/v2/solution/items/${solutionId}`, {
         method: "DELETE",
+        headers: {
+            Authorization: accessToken ? `Bearer ${accessToken}` : "",
+        },
     });
     if (!res.ok) throw new Error(`Failed to delete solution: ${res.statusText}`);
     return (await res.json()).success;

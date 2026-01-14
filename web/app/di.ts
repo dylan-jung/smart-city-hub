@@ -27,6 +27,7 @@ import { getAccessToken } from "./utils";
 const aseanBanner: AseanBannerRepository = new AseanBannerTextRepo();
 const solution: SolutionRepository = new SolutionHttpRepo({
     baseUrl: process.env.BACKEND_API_URL!,
+    authTokenGetter: getAccessToken,
 });
 const projectRecord: LocaleFacade<ProjectRecordRepository> = new LocaleFacade({
   ko: new ProjectRecordFsRepo({

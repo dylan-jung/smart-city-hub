@@ -151,6 +151,10 @@ export class SolutionRouter extends KoaRouterWrapper {
 
   private createCompany = (): Koa.Middleware => {
     return async (ctx) => {
+      const user = ctx.state.auth.user;
+      if (user?.privilege !== "manager") {
+        return ctx.throw(401, "Unauthorized");
+      }
       const dto = SolutionCompanySchema.parse(ctx.request.body);
       const res = await this.solutionService.createCompany(dto as SolutionCompanyDTO);
       ctx.body = res;
@@ -159,6 +163,10 @@ export class SolutionRouter extends KoaRouterWrapper {
 
   private updateCompany = (): Koa.Middleware => {
     return async (ctx) => {
+      const user = ctx.state.auth.user;
+      if (user?.privilege !== "manager") {
+        return ctx.throw(401, "Unauthorized");
+      }
       const companyId = ctx.params.companyId;
       const dto = SolutionCompanySchema.partial().parse(ctx.request.body);
       const res = await this.solutionService.updateCompany({ ...dto, companyId } as any); // Partial entity
@@ -168,6 +176,10 @@ export class SolutionRouter extends KoaRouterWrapper {
 
   private deleteCompany = (): Koa.Middleware => {
     return async (ctx) => {
+      const user = ctx.state.auth.user;
+      if (user?.privilege !== "manager") {
+        return ctx.throw(401, "Unauthorized");
+      }
       const res = await this.solutionService.deleteCompany(ctx.params.companyId);
       ctx.body = { success: res };
     };
@@ -175,6 +187,10 @@ export class SolutionRouter extends KoaRouterWrapper {
 
   private createItem = (): Koa.Middleware => {
     return async (ctx) => {
+      const user = ctx.state.auth.user;
+      if (user?.privilege !== "manager") {
+        return ctx.throw(401, "Unauthorized");
+      }
       const dto = SolutionItemSchema.parse(ctx.request.body);
       const res = await this.solutionService.createSolution(dto as SolutionItemDTO);
       ctx.body = res;
@@ -183,6 +199,10 @@ export class SolutionRouter extends KoaRouterWrapper {
 
   private updateItem = (): Koa.Middleware => {
     return async (ctx) => {
+      const user = ctx.state.auth.user;
+      if (user?.privilege !== "manager") {
+        return ctx.throw(401, "Unauthorized");
+      }
       const solutionId = ctx.params.solutionId;
       const dto = SolutionItemSchema.partial().parse(ctx.request.body);
       const res = await this.solutionService.updateSolution({ ...dto, solutionId } as any);
@@ -192,6 +212,10 @@ export class SolutionRouter extends KoaRouterWrapper {
 
   private deleteItem = (): Koa.Middleware => {
     return async (ctx) => {
+      const user = ctx.state.auth.user;
+      if (user?.privilege !== "manager") {
+        return ctx.throw(401, "Unauthorized");
+      }
       const res = await this.solutionService.deleteSolution(ctx.params.solutionId);
       ctx.body = { success: res };
     };
