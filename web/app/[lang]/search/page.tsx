@@ -23,7 +23,7 @@ export default async function SearchPage(props: Props) {
   const option = (searchParams.option as SearchOption) || "all";
   const keyword = searchParams.keyword || "";
   
-  const { solutions } = search(keyword, option);
+  const { solutions } = await search(keyword, option, lang);
   
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -36,7 +36,7 @@ export default async function SearchPage(props: Props) {
           {/* Results List */}
           <div className="space-y-6">
             {solutions.map((solution) => (
-              <SolutionItemCard key={solution.solutionId} solution={solution} />
+              <SolutionItemCard key={solution.solutionId} solution={solution} lang={lang} />
             ))}
           </div>
 

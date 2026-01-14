@@ -1,16 +1,16 @@
-import Link from "next/link";
-import Image from "next/image";
 import { repo } from "@/di";
+import Image from "next/image";
+import Link from "next/link";
 
-import { Locale } from "core/model";
-import { FormalHeader2 } from "@components/typography";
 import SolutionBanner from "@components/home/solution-banner";
-import CompanyBox from "./company-box";
+import { FormalHeader2 } from "@components/typography";
 import {
   getSolutionCoverByIndex,
   getSolutionInnerCoverByIndex,
 } from "@resources/images/solution-covers";
+import { Locale } from "core/model";
 import { getSolutionCategory, getSolutionCategoryAll } from "./categories";
+import CompanyBox from "./company-box";
 
 function parseCateId(cateid: string): [number, number | undefined] {
   const cate = cateid.split("-");
@@ -30,7 +30,10 @@ export default async function Page(props: { params: Promise<{ lang: Locale; cate
   const companies = await repo.solution.getCompaniesByCategory({
     mainCategoryId: cateMain,
     subCategoryId: cateSub,
+    lang,
   });
+
+  console.log(companies);
 
   return (
     <div className={`flex ${subCategory ? "flex-col-reverse" : "flex-col"}`}>

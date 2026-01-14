@@ -1,11 +1,14 @@
-import { SolutionItem } from "core/model";
+import { SolutionItemLocalized } from "core/model";
 import Link from "next/link";
 
-type SolutionWithCompany = SolutionItem & { companyName?: string };
+type SolutionWithCompany = SolutionItemLocalized & { companyName?: string };
 
-export default function SolutionItemCard({ solution }: { solution: SolutionWithCompany }) {  
+export default function SolutionItemCard({ solution, lang }: { solution: SolutionWithCompany, lang: string }) {  
   // Link format: /hub/detail/company/[companyId]/solution/[solutionId]
-  const href = `/hub/detail/company/${solution.companyId}/solution/${solution.solutionId}`;
+  const href = `/${lang}/hub/detail/company/${solution.companyId}/solution/${solution.solutionId}`;
+
+  // Localized item is already flat
+  const content = solution;
 
   return (
     <Link href={href} className="block group">
@@ -20,10 +23,10 @@ export default function SolutionItemCard({ solution }: { solution: SolutionWithC
         )}
         
         <h4 className="font-bold text-xl text-uos-blue mb-3 group-hover:text-uos-signiture-blue transition-colors">
-          {solution.title}
+          {content.title}
         </h4>
         <p className="text-gray-600 text-sm mb-4 line-clamp-3 flex-grow">
-          {solution.summary}
+          {content.summary}
         </p>
         <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
            <span className="text-sm font-medium text-uos-blue ml-2">
