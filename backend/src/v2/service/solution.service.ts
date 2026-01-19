@@ -78,7 +78,23 @@ export class SolutionService {
     return this.solutionRepo.getSolution(solutionId);
   }
 
+  private generateShortId(length: number = 8): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  }
+
   async createCompany(company: SolutionCompany): Promise<SolutionCompanyDTO> {
+    if (!company.companyId) {
+        let id = this.generateShortId();
+        while (await this.solutionRepo.getCompany(id)) {
+            id = this.generateShortId();
+        }
+        company.companyId = id;
+    }
     return this.solutionRepo.createCompany(company);
   }
 
@@ -91,6 +107,13 @@ export class SolutionService {
   }
 
   async createSolution(solution: SolutionItem): Promise<SolutionItemDTO> {
+     if (!solution.solutionId) {
+        let id = this.generateShortId();
+        while (await this.solutionRepo.getSolution(id)) {
+            id = this.generateShortId();
+        }
+        solution.solutionId = id;
+    }
     return this.solutionRepo.createSolution(solution);
   }
 

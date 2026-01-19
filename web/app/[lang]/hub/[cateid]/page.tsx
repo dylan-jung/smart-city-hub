@@ -9,7 +9,7 @@ import {
   getSolutionInnerCoverByIndex,
 } from "@resources/images/solution-covers";
 import { Locale } from "core/model";
-import { getSolutionCategory, getSolutionCategoryAll } from "./categories";
+import { getSolutionCategory, getSolutionCategoryAll } from "../categories";
 import CompanyBox from "./company-box";
 
 function parseCateId(cateid: string): [number, number | undefined] {

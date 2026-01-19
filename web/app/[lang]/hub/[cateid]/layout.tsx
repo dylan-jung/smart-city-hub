@@ -1,13 +1,13 @@
 "use client";;
 import { use } from "react";
 
-import Image from "next/image";
 import Container from "@components/container";
 import { Locale } from "core/model";
+import Image from "next/image";
 import { useTranslation } from "react-i18next";
 
 import { getSolutionCoverByIndex } from "@resources/images/solution-covers";
-import { getSolutionCategory } from "./categories";
+import { getSolutionCategory } from "../categories";
 
 export default function Layout(
   props: {

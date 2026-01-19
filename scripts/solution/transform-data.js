@@ -12,6 +12,15 @@ function val(v) {
   return v || "";
 }
 
+function generateShortId(length = 8) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
 function transform() {
   console.log('Starting transformation...');
 
@@ -26,10 +35,15 @@ function transform() {
 
   console.log(`Loaded ${companies.length} companies and ${solutions.length} solutions.`);
 
+  const companyIdMap = new Map();
+
   // 2. Transform Companies
   const newCompanies = companies.map(c => {
+    const newId = generateShortId();
+    companyIdMap.set(String(c.companyId), newId);
+    
     return {
-      companyId: String(c.companyId), // Use original ID as String
+      companyId: newId, 
       ko: {
         name: val(c.name),
         ceo: val(c.ceo),
@@ -52,8 +66,8 @@ function transform() {
   // 3. Transform Solutions
   const newSolutions = solutions.map(s => {
     return {
-      solutionId: String(s.solutionId), // Use original ID as String
-      companyId: String(s.companyId),   // Use original ID as String
+      solutionId: generateShortId(), 
+      companyId: companyIdMap.get(String(s.companyId)),   
       mainCategoryId: s.mainCategoryId,
       subCategoryId: s.subCategoryId,
       ko: {

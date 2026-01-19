@@ -14,7 +14,7 @@ const CompanyDetailsSchema = z.object({
 });
 
 const SolutionCompanySchema = z.object({
-  companyId: z.string().min(1),
+  companyId: z.string().optional(),
   ko: CompanyDetailsSchema,
   en: CompanyDetailsSchema,
 });
@@ -28,7 +28,7 @@ const SolutionItemDetailsSchema = z.object({
 });
 
 const SolutionItemSchema = z.object({
-  solutionId: z.string().min(1),
+  solutionId: z.string().optional(),
   companyId: z.string().min(1),
   mainCategoryId: z.number(),
   subCategoryId: z.number(),

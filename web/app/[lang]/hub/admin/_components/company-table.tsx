@@ -1,91 +1,14 @@
 "use client";
 
 import { SolutionCompany } from "core/model";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { createCompany, deleteCompany, getBilingualCompany, updateCompany } from "../actions";
+import { deleteCompany } from "../actions";
 
 export default function CompanyTable({ companies, total, currentPage, lang }: { companies: SolutionCompany[]; total: number; currentPage: number; lang: string }) {
-  const [isCreating, setIsCreating] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  
-  const emptyContent = { name: "", ceo: "", address: "", tel: "", fax: "", website: "" };
-  const [formData, setFormData] = useState<Partial<SolutionCompany>>({ 
-      ko: { ...emptyContent }, 
-      en: { ...emptyContent } 
-  });
-  
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'ko' | 'en'>('ko');
   const router = useRouter();
-
-  const handleEdit = async (company: SolutionCompany) => {
-    setLoading(true);
-    try {
-        const bilingualData = await getBilingualCompany(company.companyId);
-        if (bilingualData) {
-            setEditingId(bilingualData.companyId);
-            setFormData(bilingualData);
-            setIsCreating(false);
-        } else {
-            // If getBilingual returns null, maybe fallback to using the company object we have if it's already bilingual?
-            // Since company IS SolutionCompany now (bilingual), we can use it directly.
-            setEditingId(company.companyId);
-            setFormData(company);
-            setIsCreating(false);
-        }
-    } catch (e) {
-        console.error(e);
-        alert("Error fetching data");
-    } finally {
-        setLoading(false);
-    }
-  };
-
-  const handleCreate = () => {
-    setEditingId(null);
-    setFormData({
-      companyId: "",
-      ko: { ...emptyContent },
-      en: { ...emptyContent },
-    });
-    setIsCreating(true);
-    setActiveTab('ko');
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    if (name === 'companyId') {
-        setFormData(prev => ({ ...prev, companyId: value }));
-    } else {
-        setFormData(prev => ({
-            ...prev,
-            [activeTab]: {
-                ...prev[activeTab] as any,
-                [name]: value
-            }
-        }));
-    }
-  };
-
-  const handleSave = async () => {
-    setLoading(true);
-    try {
-        if (isCreating) {
-            await createCompany(formData as SolutionCompany, lang);
-        } else {
-            await updateCompany({ ...formData, companyId: editingId! } as any, lang);
-        }
-        setEditingId(null);
-        setIsCreating(false);
-        setFormData({ ko: { ...emptyContent }, en: { ...emptyContent } });
-    } catch (e) {
-        console.error(e);
-        alert("Failed to save");
-    } finally {
-        setLoading(false);
-    }
-  };
 
   const handleDelete = async (id: string) => {
     if (confirm("Delete this company?")) {
@@ -101,66 +24,17 @@ export default function CompanyTable({ companies, total, currentPage, lang }: { 
     <div className="bg-white rounded-lg shadow overflow-hidden mb-8">
       <div className="p-4 flex justify-between items-center bg-gray-50 border-b">
         <h2 className="text-lg font-semibold">Companies ({total})</h2>
-        <button onClick={handleCreate} className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 font-medium text-sm">
+        <Link href={`/${lang}/hub/admin/company/create`} className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 font-medium text-sm">
           + Add Company
-        </button>
+        </Link>
       </div>
 
-      {(isCreating || editingId) && (
-        <div className="p-4 bg-blue-50 border-b space-y-4">
-          <div className="flex justify-between items-center">
-              <h3 className="font-bold text-sm text-blue-800">{isCreating ? "New Company" : "Edit Company"}</h3>
-              <div className="flex space-x-2">
-                  <button 
-                    onClick={() => setActiveTab('ko')}
-                    className={`px-3 py-1 text-sm rounded ${activeTab === 'ko' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border'}`}
-                  >
-                    Korean
-                  </button>
-                  <button 
-                    onClick={() => setActiveTab('en')}
-                    className={`px-3 py-1 text-sm rounded ${activeTab === 'en' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border'}`}
-                  >
-                    English
-                  </button>
-              </div>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            {/* Common Field - ID */}
-             <div className="col-span-2">
-                <label className="block text-xs font-medium text-gray-700 mb-1">Company ID (Shared)</label>
-                <input 
-                    name="companyId" 
-                    type="text" 
-                    placeholder="Company ID" 
-                    value={formData.companyId || ""} 
-                    disabled={!isCreating}
-                    onChange={handleChange} 
-                    className="w-full p-2 border rounded bg-white disabled:bg-gray-100" 
-                />
-            </div>
-
-            {/* Localized Fields */}
-            <input name="name" placeholder="Name" value={formData[activeTab]?.name || ""} onChange={handleChange} className="p-2 border rounded" required />
-            <input name="ceo" placeholder="CEO" value={formData[activeTab]?.ceo || ""} onChange={handleChange} className="p-2 border rounded" />
-            <input name="address" placeholder="Address" value={formData[activeTab]?.address || ""} onChange={handleChange} className="p-2 border rounded" />
-            <input name="tel" placeholder="Tel" value={formData[activeTab]?.tel || ""} onChange={handleChange} className="p-2 border rounded" />
-            <input name="fax" placeholder="Fax" value={formData[activeTab]?.fax || ""} onChange={handleChange} className="p-2 border rounded" />
-            <input name="website" placeholder="Website" value={formData[activeTab]?.website || ""} onChange={handleChange} className="p-2 border rounded" />
-          </div>
-          <div className="flex justify-end gap-2">
-            <button onClick={() => { setIsCreating(false); setEditingId(null); setFormData({ ko: { ...emptyContent }, en: { ...emptyContent } }); }} className="px-3 py-1 text-gray-600 border rounded hover:bg-gray-100">Cancel</button>
-            <button onClick={handleSave} disabled={loading} className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">{loading ? "Saving..." : "Save"}</button>
-          </div>
-        </div>
-      )}
 
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CEO</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -171,14 +45,14 @@ export default function CompanyTable({ companies, total, currentPage, lang }: { 
                const content = lang === 'en' ? (company.en || company.ko) : company.ko;
                return (
                   <tr key={company.companyId} className="hover:bg-gray-50 cursor-pointer" onClick={(e) => {
-                       if ((e.target as HTMLElement).closest('button')) return;
+                       if ((e.target as HTMLElement).closest('button') || (e.target as HTMLElement).closest('a')) return;
                        router.push(`/${lang}/hub/admin/company/${company.companyId}`);
                   }}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{company.companyId}</td>
+
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{content.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{content.ceo}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button onClick={() => handleEdit(company)} className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
+                      <Link href={`/${lang}/hub/admin/company/${company.companyId}/edit`} className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</Link>
                       <button onClick={() => handleDelete(company.companyId)} className="text-red-600 hover:text-red-900">Delete</button>
                     </td>
                   </tr>

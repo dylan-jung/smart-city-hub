@@ -15,7 +15,7 @@ import urbanCityLandscapeImg from "@resources/images/urban-city-landscape.jpg";
 
 import SearchSection from "@components/home/search-section";
 
-import { getSolutionCategoryAll } from "./hub/[cateid]/categories";
+import { getSolutionCategoryAll } from "./hub/categories";
 
 export default async function Home(props: { params: Promise<{ lang: string }> }) {
   const lang = (await props.params).lang as Locale;

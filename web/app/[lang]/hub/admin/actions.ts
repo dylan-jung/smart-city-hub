@@ -9,7 +9,7 @@ export async function getBilingualCompany(companyId: string) {
         const company = await repo.solution.getCompany(companyId);
         return company as SolutionCompany;
     } catch (e) {
-        console.error("Failed to fetch bilingual company", e);
+        // console.error("Failed to fetch bilingual company", e);
         return null;
     }
 }
@@ -19,7 +19,7 @@ export async function getBilingualSolution(solutionId: string) {
         const solution = await repo.solution.getSolution(solutionId);
         return solution as SolutionItem;
     } catch (e) {
-        console.error("Failed to fetch bilingual solution", e);
+        // console.error("Failed to fetch bilingual solution", e);
         return null;
     }
 }
