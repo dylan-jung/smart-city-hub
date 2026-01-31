@@ -1,6 +1,6 @@
 "use client";
 
-import { Locale, SolutionItem } from "core/model";
+import { SolutionItem } from "core/model";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { getSolutionCategoryAll, getSuperCategory, getSuperCategoryFromMainCategory, superCategories } from "../../../../../../categories";
@@ -27,7 +27,7 @@ export default function SolutionCreateForm({ lang, companyId }: Props) {
   
   const [loading, setLoading] = useState(false);
   
-  const allCategories = useMemo(() => getSolutionCategoryAll(lang as Locale), [lang]);
+  const allCategories = useMemo(() => getSolutionCategoryAll(), []);
 
   // Derived state for dropdowns
   const currentSuperId = formData.superCategoryId ?? 0;
@@ -35,10 +35,10 @@ export default function SolutionCreateForm({ lang, companyId }: Props) {
 
   // Filter main categories based on selected super category
   const filteredMainCategories = useMemo(() => {
-    const superCat = getSuperCategory(currentSuperId, lang as Locale);
+    const superCat = getSuperCategory(currentSuperId);
     if (!superCat || !superCat.categoryIds) return [];
     return superCat.categoryIds.map(id => ({ id, ...allCategories[id] }));
-  }, [currentSuperId, allCategories, lang]);
+  }, [currentSuperId, allCategories]);
 
   // Subcategories based on selected main category
   const subCategories = useMemo(() => {
@@ -47,7 +47,7 @@ export default function SolutionCreateForm({ lang, companyId }: Props) {
 
   // Set initial main category when super category changes if current main isn't in valid list
   useEffect(() => {
-      const superCat = getSuperCategory(currentSuperId, lang as Locale);
+      const superCat = getSuperCategory(currentSuperId);
       if (superCat && superCat.categoryIds && !superCat.categoryIds.includes(currentMainId)) {
           // Select first available main category
           const firstMainId = superCat.categoryIds[0];
@@ -57,7 +57,7 @@ export default function SolutionCreateForm({ lang, companyId }: Props) {
               subCategoryId: 0
           }));
       }
-  }, [currentSuperId, lang]); // Only check when super ID changes
+  }, [currentSuperId]); // Only check when super ID changes
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -126,7 +126,7 @@ export default function SolutionCreateForm({ lang, companyId }: Props) {
                             className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                         >
                             {superCategories.map((cat, idx) => (
-                                <option key={idx} value={idx}>{lang === 'ko' ? cat.name : cat.nameEng}</option>
+                                <option key={idx} value={idx}>{cat.name}</option>
                             ))}
                         </select>
                     </div>

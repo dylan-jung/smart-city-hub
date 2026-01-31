@@ -26,21 +26,20 @@ export default async function Page(props: {
   const mainId = parseInt(mainCategoryId);
   const subId = parseInt(subCategoryId);
 
-  const superCategory = getSuperCategory(superId, lang);
-  const mainCategory = getSolutionCategory(mainId, lang);
+  const superCategory = getSuperCategory(superId);
+  const mainCategory = getSolutionCategory(mainId);
   const subCategory = mainCategory.subCategories[subId];
-  const rawMainCategoryName = getSolutionCategory(mainId, "ko").name;
+  const rawMainCategoryName = mainCategory.name;
 
   const firstMainCatId = superCategory.categoryIds[0];
-  const firstMainCatName = getSolutionCategory(firstMainCatId, "ko").name;
-  const coverImage = getSolutionCoverById(firstMainCatName) || getSolutionCoverById("건설");
+  const firstMainCategory = getSolutionCategory(firstMainCatId);
+  const coverImage = getSolutionCoverById(firstMainCategory.name) || getSolutionCoverById("건설");
 
   const bannerLinks = superCategory.categoryIds.map((catId) => {
-    const rawCatName = getSolutionCategory(catId, "ko").name;
-    const catData = getSolutionCategory(catId, lang);
+    const catData = getSolutionCategory(catId);
     return {
-      title: catData.name,
-      imgSrc: getSolutionCoverById(rawCatName),
+      title: t(catData.name),
+      imgSrc: getSolutionCoverById(catData.name),
       href: `/hub/categories/${superId}/${catId}/0`,
       isActive: catId === mainId,
     };
@@ -63,8 +62,8 @@ export default async function Page(props: {
           height={288}
         />
         <div className="flex flex-col items-center justify-center absolute top-0 left-0 w-full h-full text-white bg-uos-gray/50">
-          <h1 className="font-bold text-4xl md:text-6xl">{superCategory.name}</h1>
-          <h2 className="font-medium text-2xl mt-3">{t("스마트도시 솔루션")}</h2>
+          <h1 className="font-bold text-4xl md:text-6xl">{t(superCategory.name)}</h1>
+          <h2 className="font-medium text-2xl mt-3">{t(superCategory.description)}</h2>
         </div>
       </header>
 
@@ -82,17 +81,19 @@ export default async function Page(props: {
             
             <div className="w-full md:w-4/5 flex flex-col items-center my-4">
               <div className="border rounded-lg w-[1024px]">
+                {/* 
+                It seems like legacy(english description is not supported)
                 <div className="p-6">
                   {mainCategory.desc.map((desc, idx) => (
                     <p className="mb-1 text-sm font-medium text-center" key={idx}>
-                      {desc}
+                      {t(desc)}
                     </p>
                   ))}
-                </div>
+                </div> */}
                 <p className="text-center font-bold mb-8">
                   {lang === "ko"
-                    ? `아래의 소분류를 선택해서 ${mainCategory.name} 분야의 국내 기업들을 확인해보세요.`
-                    : `Select a subcategory below to see domestic companies in the ${mainCategory.name} field.`}
+                    ? `아래의 소분류를 선택해서 ${t(mainCategory.name)} 분야의 국내 기업들을 확인해보세요.`
+                    : `Select a subcategory below to see domestic companies in the ${t(mainCategory.name)} field.`}
                 </p>
                 <div className="relative">
                    <Image
@@ -116,7 +117,7 @@ export default async function Page(props: {
                       }}
                       href={`/hub/categories/${superId}/${mainId}/${idx}`}
                     >
-                      {sub.name}
+                      {t(sub.name)}
                     </Link>
                   ))}
                 </div>
@@ -127,13 +128,13 @@ export default async function Page(props: {
             {/* Sub Category Content */}
             <div className="my-4">
               <FormalHeader2 className="mb-4 flex items-center">
-                {mainCategory.name}
+                {t(mainCategory.name)}
                 <span className="w-6 mx-1">
                   <svg focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                     <path d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"></path>
                   </svg>
                 </span>
-                {subCategory.name}
+                {t(subCategory.name)}
               </FormalHeader2>
               <div className="w-full mb-8">
                 {companies.map((company) => (

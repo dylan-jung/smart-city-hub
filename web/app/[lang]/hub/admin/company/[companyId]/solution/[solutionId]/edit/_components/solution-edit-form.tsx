@@ -1,6 +1,6 @@
 "use client";
 
-import { Locale, SolutionItem } from "core/model";
+import { SolutionItem } from "core/model";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { getSolutionCategoryAll, getSuperCategory, getSuperCategoryFromMainCategory, superCategories } from "../../../../../../../categories";
@@ -28,7 +28,7 @@ export default function SolutionEditForm({ solution, lang }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   
-  const allCategories = useMemo(() => getSolutionCategoryAll(lang as Locale), [lang]);
+  const allCategories = useMemo(() => getSolutionCategoryAll(), []);
 
   // Derived state for dropdowns
   const currentSuperId = formData.superCategoryId ?? 0;
@@ -36,10 +36,10 @@ export default function SolutionEditForm({ solution, lang }: Props) {
 
   // Filter main categories based on selected super category
   const filteredMainCategories = useMemo(() => {
-    const superCat = getSuperCategory(currentSuperId, lang as Locale);
+    const superCat = getSuperCategory(currentSuperId);
     if (!superCat || !superCat.categoryIds) return [];
     return superCat.categoryIds.map(id => ({ id, ...allCategories[id] }));
-  }, [currentSuperId, allCategories, lang]);
+  }, [currentSuperId, allCategories]);
 
   // Subcategories based on selected main category
   const subCategories = useMemo(() => {
@@ -53,7 +53,7 @@ export default function SolutionEditForm({ solution, lang }: Props) {
     if (name === 'superCategoryId') {
         const newSuperId = parseInt(value);
         // Find first main category of this super category to set as default
-        const superCat = getSuperCategory(newSuperId, lang as Locale);
+        const superCat = getSuperCategory(newSuperId);
         const firstMainId = superCat?.categoryIds[0] ?? 0;
         
         setFormData(prev => ({ 
@@ -133,7 +133,7 @@ export default function SolutionEditForm({ solution, lang }: Props) {
                         className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                     >
                         {superCategories.map((cat, idx) => (
-                            <option key={idx} value={idx}>{lang === 'ko' ? cat.name : cat.nameEng}</option>
+                            <option key={idx} value={idx}>{cat.name}</option>
                         ))}
                     </select>
                  </div>
