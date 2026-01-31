@@ -2,8 +2,8 @@
 
 import { Locale, SolutionItem } from "core/model";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { getSolutionCategoryAll } from "../../../../../../categories";
+import { useEffect, useMemo, useState } from "react";
+import { getSolutionCategoryAll, getSuperCategory, getSuperCategoryFromMainCategory, superCategories } from "../../../../../../categories";
 import { createSolution } from "../../../../../actions";
 
 type Props = {
@@ -14,22 +14,57 @@ type Props = {
 export default function SolutionCreateForm({ lang, companyId }: Props) {
   const router = useRouter();
   const emptyContent = { title: "", summary: "", abstract: "", feature: "", composition: "" };
+  
+  // Initialize formData
   const [formData, setFormData] = useState<Partial<SolutionItem>>({ 
       companyId: companyId,
+      superCategoryId: 0,
       mainCategoryId: 0,
       subCategoryId: 0,
       ko: { ...emptyContent },
       en: { ...emptyContent }
   });
+  
   const [loading, setLoading] = useState(false);
   
-  const categories = getSolutionCategoryAll(lang as Locale);
-  const currentMainCat = formData.mainCategoryId ?? 0;
-  const subCategories = categories[currentMainCat]?.subCategories || [];
+  const allCategories = useMemo(() => getSolutionCategoryAll(lang as Locale), [lang]);
+
+  // Derived state for dropdowns
+  const currentSuperId = formData.superCategoryId ?? 0;
+  const currentMainId = formData.mainCategoryId ?? 0;
+
+  // Filter main categories based on selected super category
+  const filteredMainCategories = useMemo(() => {
+    const superCat = getSuperCategory(currentSuperId, lang as Locale);
+    if (!superCat || !superCat.categoryIds) return [];
+    return superCat.categoryIds.map(id => ({ id, ...allCategories[id] }));
+  }, [currentSuperId, allCategories, lang]);
+
+  // Subcategories based on selected main category
+  const subCategories = useMemo(() => {
+    return allCategories[currentMainId]?.subCategories || [];
+  }, [currentMainId, allCategories]);
+
+  // Set initial main category when super category changes if current main isn't in valid list
+  useEffect(() => {
+      const superCat = getSuperCategory(currentSuperId, lang as Locale);
+      if (superCat && superCat.categoryIds && !superCat.categoryIds.includes(currentMainId)) {
+          // Select first available main category
+          const firstMainId = superCat.categoryIds[0];
+          setFormData(prev => ({
+              ...prev,
+              mainCategoryId: firstMainId,
+              subCategoryId: 0
+          }));
+      }
+  }, [currentSuperId, lang]); // Only check when super ID changes
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    if (name === 'mainCategoryId') {
+    
+    if (name === 'superCategoryId') {
+        setFormData(prev => ({ ...prev, superCategoryId: parseInt(value) }));
+    } else if (name === 'mainCategoryId') {
         setFormData(prev => ({ ...prev, mainCategoryId: parseInt(value), subCategoryId: 0 }));
     } else if (name === 'subCategoryId') {
         setFormData(prev => ({ ...prev, subCategoryId: parseInt(value) }));
@@ -48,7 +83,14 @@ export default function SolutionCreateForm({ lang, companyId }: Props) {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const res = await createSolution(formData as SolutionItem, lang);
+      // Ensure superCategoryId matches mainCategoryId properly before submitting (sanity check)
+      const derivedSuper = getSuperCategoryFromMainCategory(formData.mainCategoryId!);
+      const finalData = {
+          ...formData,
+          superCategoryId: derivedSuper ? derivedSuper.id : formData.superCategoryId
+      };
+
+      const res = await createSolution(finalData as SolutionItem, lang);
       if (res.success) {
         alert("Solution created successfully");
         router.push(`/${lang}/hub/admin/company/${companyId}`);
@@ -74,22 +116,35 @@ export default function SolutionCreateForm({ lang, companyId }: Props) {
              {/* Shared Fields - Categories */}
              <div className="grid grid-cols-1 gap-6 bg-gray-50 p-6 rounded-lg border border-gray-200">
                 <div className="mb-2 font-bold text-lg text-gray-800 border-b pb-2">카테고리 설정</div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-1">대분류</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">상위분류 (Super)</label>
                         <select 
-                            name="mainCategoryId" 
-                            value={formData.mainCategoryId || 0} 
+                            name="superCategoryId" 
+                            value={currentSuperId} 
                             onChange={handleChange} 
                             className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                         >
-                            {categories.map((cat: any, idx: number) => (
-                                <option key={idx} value={idx}>{cat.name}</option>
+                            {superCategories.map((cat, idx) => (
+                                <option key={idx} value={idx}>{lang === 'ko' ? cat.name : cat.nameEng}</option>
                             ))}
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-1">소분류</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">대분류 (Main)</label>
+                        <select 
+                            name="mainCategoryId" 
+                            value={currentMainId} 
+                            onChange={handleChange} 
+                            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                        >
+                            {filteredMainCategories.map((cat) => (
+                                <option key={cat.id} value={cat.id}>{cat.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">소분류 (Sub)</label>
                         <select 
                             name="subCategoryId" 
                             value={formData.subCategoryId || 0} 

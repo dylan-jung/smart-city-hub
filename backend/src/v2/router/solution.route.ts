@@ -30,6 +30,7 @@ const SolutionItemDetailsSchema = z.object({
 const SolutionItemSchema = z.object({
   solutionId: z.string().optional(),
   companyId: z.string().min(1),
+  superCategoryId: z.number(),
   mainCategoryId: z.number(),
   subCategoryId: z.number(),
   ko: SolutionItemDetailsSchema,

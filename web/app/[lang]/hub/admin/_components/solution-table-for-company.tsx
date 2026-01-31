@@ -4,7 +4,7 @@ import { Locale, SolutionItem } from "core/model";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { getSolutionCategoryAll } from "../../categories";
+import { getSolutionCategory, getSolutionCategoryAll, superCategories } from "../../categories";
 import { deleteSolution } from "../actions";
 
 type Props = {
@@ -62,18 +62,20 @@ export function SolutionTableForCompany({ solutions: initialSolutions, lang, com
              )}
             {solutions.map((solution) => {
                const content = lang === 'en' ? (solution.en || solution.ko) : solution.ko;
+               // Derive category names
+               const superCatName = superCategories[solution.superCategoryId ?? 0]?.name || "";
+               const mainCat = getSolutionCategory(solution.mainCategoryId, lang as any);
+               const subCat = mainCat?.subCategories[solution.subCategoryId];
+               
                return (
                   <tr key={solution.solutionId}>
 
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{content.title}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {/* Show readable Category Name instead of ID if possible, but the user requirement said "Use readable text for UI", which mostly implies form. 
-                            However, the table also shows category ID. I'll stick to ID for now or I can map it too. 
-                            The user said "mainCategoryId, subCategoryId is hard to understand as numbers. @[categories.ts] ... UI allows text ... internal uses ID".
-                            Usually this means inputs. But table display is also UI.
-                            I can use getSolutionCategoryAll here too.
-                        */}
-                        {categories[solution.mainCategoryId]?.name || solution.mainCategoryId} - {categories[solution.mainCategoryId]?.subCategories[solution.subCategoryId]?.name || solution.subCategoryId}
+                        <div className="flex flex-col">
+                            <span className="text-xs text-gray-400 font-semibold">{lang === 'ko' ? superCategories[solution.superCategoryId ?? 0]?.name : superCategories[solution.superCategoryId ?? 0]?.nameEng}</span>
+                            <span>{mainCat?.name} &gt; {subCat?.name}</span>
+                        </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <Link href={`/${lang}/hub/admin/company/${companyId}/solution/${solution.solutionId}/edit`} className="text-indigo-600 hover:text-indigo-900 mr-4">

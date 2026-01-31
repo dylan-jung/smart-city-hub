@@ -2,8 +2,8 @@
 
 import { Locale, SolutionItem } from "core/model";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { getSolutionCategoryAll } from "../../../../../../../categories";
+import { useMemo, useState } from "react";
+import { getSolutionCategoryAll, getSuperCategory, getSuperCategoryFromMainCategory, superCategories } from "../../../../../../../categories";
 import { deleteSolution, updateSolution } from "../actions";
 
 type Props = {
@@ -12,18 +12,57 @@ type Props = {
 };
 
 export default function SolutionEditForm({ solution, lang }: Props) {
-  const [formData, setFormData] = useState<SolutionItem>(solution);
+  // Initialize formData with solution. ensure superCategoryId is set correctly
+  const [formData, setFormData] = useState<SolutionItem>(() => {
+      let initialSuperId = solution.superCategoryId;
+      if (!initialSuperId && solution.mainCategoryId !== undefined) {
+          const derived = getSuperCategoryFromMainCategory(solution.mainCategoryId);
+          if (derived) initialSuperId = derived.id;
+      }
+      return {
+          ...solution,
+          superCategoryId: initialSuperId ?? 0
+      };
+  });
+  
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   
-  const categories = getSolutionCategoryAll(lang as Locale);
-  const currentMainCat = formData.mainCategoryId ?? 0;
-  const subCategories = categories[currentMainCat]?.subCategories || [];
+  const allCategories = useMemo(() => getSolutionCategoryAll(lang as Locale), [lang]);
 
+  // Derived state for dropdowns
+  const currentSuperId = formData.superCategoryId ?? 0;
+  const currentMainId = formData.mainCategoryId ?? 0;
+
+  // Filter main categories based on selected super category
+  const filteredMainCategories = useMemo(() => {
+    const superCat = getSuperCategory(currentSuperId, lang as Locale);
+    if (!superCat || !superCat.categoryIds) return [];
+    return superCat.categoryIds.map(id => ({ id, ...allCategories[id] }));
+  }, [currentSuperId, allCategories, lang]);
+
+  // Subcategories based on selected main category
+  const subCategories = useMemo(() => {
+    return allCategories[currentMainId]?.subCategories || [];
+  }, [currentMainId, allCategories]);
+
+  // Ensure main category is valid for super category when super category changes (user interaction)
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
 
-    if (name === 'mainCategoryId') {
+    if (name === 'superCategoryId') {
+        const newSuperId = parseInt(value);
+        // Find first main category of this super category to set as default
+        const superCat = getSuperCategory(newSuperId, lang as Locale);
+        const firstMainId = superCat?.categoryIds[0] ?? 0;
+        
+        setFormData(prev => ({ 
+            ...prev, 
+            superCategoryId: newSuperId,
+            mainCategoryId: firstMainId,
+            subCategoryId: 0 
+        }));
+    } else if (name === 'mainCategoryId') {
         const newVal = parseInt(value);
         setFormData(prev => ({ 
             ...prev, 
@@ -49,10 +88,19 @@ export default function SolutionEditForm({ solution, lang }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    await updateSolution(formData, lang, solution.companyId);
+    
+    // Final sanity check for superCategoryId
+    const derivedSuper = getSuperCategoryFromMainCategory(formData.mainCategoryId);
+    const finalData = {
+        ...formData,
+        superCategoryId: derivedSuper ? derivedSuper.id : formData.superCategoryId
+    };
+    
+    await updateSolution(finalData, lang, solution.companyId);
     setIsLoading(false);
     alert('Solution updated successfully');
     router.push(`/${lang}/hub/admin/company/${solution.companyId}`);
+    router.refresh(); // Refresh to show updated data
   };
 
   const handleDelete = async () => {
@@ -61,6 +109,7 @@ export default function SolutionEditForm({ solution, lang }: Props) {
       await deleteSolution(solution.solutionId, lang, solution.companyId);
       setIsLoading(false);
       router.push(`/${lang}/hub/admin/company/${solution.companyId}`);
+      router.refresh();
     }
   };
 
@@ -74,24 +123,37 @@ export default function SolutionEditForm({ solution, lang }: Props) {
         {/* Shared Fields */}
         <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 grid grid-cols-1 gap-6">
              <div className="mb-2 font-bold text-lg text-gray-800 border-b pb-2">카테고리 설정</div>
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">대분류</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">상위분류 (Super)</label>
+                    <select
+                        name="superCategoryId"
+                        value={currentSuperId}
+                        onChange={handleChange}
+                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                    >
+                        {superCategories.map((cat, idx) => (
+                            <option key={idx} value={idx}>{lang === 'ko' ? cat.name : cat.nameEng}</option>
+                        ))}
+                    </select>
+                 </div>
+                 <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">대분류 (Main)</label>
                     <select
                         name="mainCategoryId"
-                        value={formData.mainCategoryId}
+                        value={currentMainId}
                         onChange={handleChange}
                         className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                         required
                     >
-                        {categories.map((cat, idx) => (
-                            <option key={idx} value={idx}>{cat.name}</option>
+                        {filteredMainCategories.map((cat) => (
+                            <option key={cat.id} value={cat.id}>{cat.name}</option>
                         ))}
                     </select>
                  </div>
                  
                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">소분류</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">소분류 (Sub)</label>
                     <select
                         name="subCategoryId"
                         value={formData.subCategoryId}

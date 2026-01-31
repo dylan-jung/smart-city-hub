@@ -33,7 +33,10 @@ const navigationList: NavigationItem[] = [
     href: "/hub",
     subNav: [
       { text: "아세안 국가 정보", href: "/asean" },
-      { text: "스마트도시 솔루션", href: "/hub" },
+      { text: "스마트 인프라·환경", href: "/hub/categories/0/0/0" },
+      { text: "스마트 경제·산업", href: "/hub/categories/1/6/0" },
+      { text: "스마트 안전·행정", href: "/hub/categories/2/13/0" },
+      { text: "스마트 생활·복지", href: "/hub/categories/3/17/0" },
     ],
   },
   {

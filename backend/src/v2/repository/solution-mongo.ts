@@ -31,6 +31,7 @@ const SolutionItemSchema = new Schema<SolutionItem>(
   {
     solutionId: { type: String, required: true, unique: true },
     companyId: { type: String, required: true },
+    superCategoryId: { type: Number, required: true },
     mainCategoryId: { type: Number, required: true },
     subCategoryId: { type: Number, required: true },
     ko: {
@@ -51,7 +52,7 @@ const SolutionItemSchema = new Schema<SolutionItem>(
   { versionKey: false }
 );
 
-SolutionItemSchema.index({ mainCategoryId: 1, subCategoryId: 1 });
+SolutionItemSchema.index({ superCategoryId: 1, mainCategoryId: 1, subCategoryId: 1 });
 SolutionItemSchema.index({ companyId: 1 });
 
 export class SolutionMongoRepo implements SolutionRepository {
@@ -178,6 +179,9 @@ export class SolutionMongoRepo implements SolutionRepository {
   }
 
   async search(query: string, lang: string = 'ko'): Promise<SolutionItem[]> {
+    // I implemented this search function in a naive way: text-search
+    // If you find bottleneck, please refactor this function to use a more efficient search method.
+
     const regex = new RegExp(query, "i");
     const langPrefix = lang === 'en' ? 'en' : 'ko';
 

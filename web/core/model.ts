@@ -74,25 +74,22 @@ export type SolutionCompany = {
   };
 };
 
+export type SolutionItemDetails = {
+  title: string;
+  summary: string;
+  abstract: string;
+  feature: string;
+  composition: string;
+};
+
 export type SolutionItem = {
   solutionId: string;
   companyId: string;
+  superCategoryId: number;
   mainCategoryId: number;
   subCategoryId: number;
-  ko: {
-    title: string;
-    summary: string;
-    abstract: string;
-    feature: string;
-    composition: string;
-  };
-  en: {
-    title: string;
-    summary: string;
-    abstract: string;
-    feature: string;
-    composition: string;
-  };
+  ko: SolutionItemDetails;
+  en: SolutionItemDetails;
 };
 
 // Localized View

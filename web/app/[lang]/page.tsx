@@ -7,15 +7,15 @@ import { Locale } from "core/model";
 import CardLink from "@components/card-link";
 import Container from "@components/container";
 import AseanBanner from "@components/home/asean-banner";
-import SolutionBanner from "@components/home/solution-banner";
+import CircleCategoryNav from "@components/home/circle-category-nav";
 import { FormalHeader2 } from "@components/typography";
 
-import { getSolutionCoverByIndex } from "@resources/images/solution-covers";
+import { getSolutionCoverById } from "@resources/images/solution-covers";
 import urbanCityLandscapeImg from "@resources/images/urban-city-landscape.jpg";
 
 import SearchSection from "@components/home/search-section";
 
-import { getSolutionCategoryAll } from "./hub/categories";
+import { getSolutionCategory, getSuperCategory, superCategories } from "./hub/categories";
 
 export default async function Home(props: { params: Promise<{ lang: string }> }) {
   const lang = (await props.params).lang as Locale;
@@ -38,23 +38,30 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
         </div>
       </div>
 
-      <section className="bg-global-gray-light pt-4 pb-6 border-b">
-        {/* <Container>
-          <FormalHeader2>{t("asean-banner-header")}</FormalHeader2>
-        </Container> */}
-
+      <section className="bg-global-gray-light pt-4 pb-6 border-b">      
         <Container className="mt-4 mb-8">
           {/* 솔루션 바로가기 배너 */}
-          <SolutionBanner
-            linkProps={getSolutionCategoryAll(lang).map(({ name }, idx) => ({
-              title: name,
-              imgSrc: getSolutionCoverByIndex(idx),
-              href: `/hub/${idx}`,
-            }))}
+          <FormalHeader2>{t("solution-banner-header")}</FormalHeader2>
+          {/* 솔루션 바로가기 배너 */}
+          <CircleCategoryNav
+            className="mt-8 mb-12 px-4 md:px-0"
+            linkProps={superCategories.map((_, idx) => {
+               const superCatData = getSuperCategory(idx, lang);
+               const firstMainCatId = superCatData.categoryIds[0];
+               const rawMainCatName = getSolutionCategory(firstMainCatId, "ko").name;
+               return {
+                  title: superCatData.name,
+                  imgSrc: getSolutionCoverById(rawMainCatName),
+                  href: `/hub/categories/${idx}/${firstMainCatId}/0`,
+               };
+            })}
           />
         </Container>
 
         {/* 아세안 국가 바로가기 배너 */}
+        <Container>
+          <FormalHeader2>{t("asean-banner-header")}</FormalHeader2>
+        </Container>
         <AseanBanner
           className="max-w-screen-2xl mx-4 md:mx-auto"
           linkProps={repo.aseanBanner.getItemAll(lang).map((item) => ({

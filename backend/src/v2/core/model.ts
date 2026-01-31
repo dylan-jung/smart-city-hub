@@ -70,6 +70,7 @@ export type SolutionItemDetails = {
 export type SolutionItem = {
     solutionId: string;
     companyId: string;
+    superCategoryId: number;
     mainCategoryId: number;
     subCategoryId: number;
     ko: SolutionItemDetails;
