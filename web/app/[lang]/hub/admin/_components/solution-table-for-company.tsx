@@ -1,10 +1,10 @@
 "use client";
 
-import { Locale, SolutionItem } from "core/model";
+import { SolutionItem } from "core/model";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { getSolutionCategory, getSolutionCategoryAll, superCategories } from "../../categories";
+import { getSolutionCategory, superCategories } from "../../categories";
 import { deleteSolution } from "../actions";
 
 type Props = {
@@ -17,8 +17,6 @@ export function SolutionTableForCompany({ solutions: initialSolutions, lang, com
   const [solutions, setSolutions] = useState<SolutionItem[]>(initialSolutions);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-
-  const categories = getSolutionCategoryAll(lang as Locale);
 
   const handleDelete = async (id: string) => {
        if (confirm("Delete this solution?")) {
@@ -61,10 +59,10 @@ export function SolutionTableForCompany({ solutions: initialSolutions, lang, com
                 </tr>
              )}
             {solutions.map((solution) => {
-               const content = lang === 'en' ? (solution.en || solution.ko) : solution.ko;
+               const content = solution.ko;
                // Derive category names
                const superCatName = superCategories[solution.superCategoryId ?? 0]?.name || "";
-               const mainCat = getSolutionCategory(solution.mainCategoryId, lang as any);
+               const mainCat = getSolutionCategory(solution.mainCategoryId);
                const subCat = mainCat?.subCategories[solution.subCategoryId];
                
                return (
@@ -73,7 +71,7 @@ export function SolutionTableForCompany({ solutions: initialSolutions, lang, com
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{content.title}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         <div className="flex flex-col">
-                            <span className="text-xs text-gray-400 font-semibold">{lang === 'ko' ? superCategories[solution.superCategoryId ?? 0]?.name : superCategories[solution.superCategoryId ?? 0]?.nameEng}</span>
+                            <span className="text-xs text-gray-400 font-semibold">{superCategories[solution.superCategoryId ?? 0]?.name}</span>
                             <span>{mainCat?.name} &gt; {subCat?.name}</span>
                         </div>
                     </td>

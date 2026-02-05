@@ -38,21 +38,21 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
         </div>
       </div>
 
-      <section className="bg-global-gray-light pt-4 pb-6 border-b">      
-        <Container className="mt-4 mb-8">
+      <section className="bg-global-gray-light pt-4 pb-6 border-b">
+        <Container className="mt-4 mb-24">
           <FormalHeader2>{t("solution-banner-header")}</FormalHeader2>
           {/* 솔루션 바로가기 배너 */}
           <CircleCategoryNav
-            className="mt-8 mb-12 px-4 md:px-0"
+            className="mt-6 mb-8 px-4 md:px-0"
             linkProps={superCategories.map((_, idx) => {
-               const superCatData = getSuperCategory(idx);
-               const firstMainCatId = superCatData.categoryIds[0];
-               const firstMainCategory = getSolutionCategory(firstMainCatId);
-               return {
-                  title: t(superCatData.name),
-                  imgSrc: getSolutionCoverById(firstMainCategory.name),
-                  href: `/hub/categories/${idx}/${firstMainCatId}/0`,
-               };
+              const superCatData = getSuperCategory(idx);
+              const firstMainCatId = superCatData.categoryIds[0];
+              const firstMainCategory = getSolutionCategory(firstMainCatId);
+              return {
+                title: t(superCatData.name),
+                imgSrc: getSolutionCoverById(firstMainCategory.name),
+                href: `/hub/categories/${idx}/${firstMainCatId}/0`,
+              };
             })}
           />
         </Container>

@@ -29,7 +29,7 @@ const navigationList: NavigationItem[] = [
     ],
   },
   {
-    text: "기술협력",
+    text: "국가·기술협력",
     href: "/hub",
     subNav: [
       { text: "아세안 국가 정보", href: "/asean" },

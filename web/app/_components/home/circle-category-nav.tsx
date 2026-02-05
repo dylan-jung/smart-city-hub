@@ -35,7 +35,9 @@ export default function CircleCategoryNav(props: {
   className?: string;
 }) {
   return (
-    <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 lg:gap-12 ${props.className ?? ""}`}>
+    <div
+      className={`grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-12 lg:gap-16 ${props.className ?? ""}`}
+    >
       {props.linkProps.map((props, idx) => {
         return <CircleCategoryNavLink key={idx} {...props} />;
       })}
